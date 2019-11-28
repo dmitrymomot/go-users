@@ -11,14 +11,14 @@ import (
 type (
 	// Interactor structure
 	Interactor struct {
-		repository Repository
+		repository UserRepository
 	}
 
 	// UserRepository interface
 	UserRepository interface {
 		GetByID(id string) (*User, error)
 		GetByEmail(email string) (*User, error)
-		GetList(limit, offset int, sort string, where ...interface{}) ([]*User, error)
+		GetList(condition ...interface{}) ([]*User, error)
 		Insert(*User) error
 		Update(*User) error
 		Delete(id string) error
@@ -26,7 +26,7 @@ type (
 )
 
 // NewInteractor factory
-func NewInteractor(r Repository, signingKey string) *Interactor {
+func NewInteractor(r UserRepository, signingKey string) *Interactor {
 	if signingKey == "" {
 		signingKey = "secret%key"
 	}

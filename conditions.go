@@ -14,6 +14,25 @@ const (
 	QsOffset
 )
 
+// Predefined users list ordering
+const (
+	// ORDER BY created_at ASC
+	OrderByCreatedAtAsc Order = iota + 1
+	// ORDER BY created_at DESC
+	OrderByCreatedAtDesc
+	// ORDER BY updated_at ASC
+	OrderByUpdatedAtAsc
+	// ORDER BY updated_at DESC
+	OrderByUpdatedAtDesc
+)
+
+var orderQueryMap = map[Order]string{
+	OrderByCreatedAtAsc:  "created_at ASC",
+	OrderByCreatedAtDesc: "created_at DESC",
+	OrderByUpdatedAtAsc:  "updated_at ASC",
+	OrderByUpdatedAtDesc: "updated_at DESC",
+}
+
 type (
 	// Condition struct
 	Condition interface {
@@ -21,6 +40,9 @@ type (
 		Params() []interface{}
 		Type() QuerySection
 	}
+
+	// Order type
+	Order int
 
 	// QuerySection type
 	QuerySection int
@@ -31,6 +53,13 @@ type (
 		t      QuerySection
 	}
 )
+
+func (o Order) String() string {
+	if v, ok := orderQueryMap[o]; ok {
+		return v
+	}
+	return ""
+}
 
 // Query string
 func (c condition) Query() string {

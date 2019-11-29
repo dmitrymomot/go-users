@@ -8,42 +8,13 @@ import (
 	"github.com/pkg/errors"
 )
 
-// Predefined users list ordering
-const (
-	// ORDER BY created_at ASC
-	CreatedAtAsc Order = iota + 1
-	// ORDER BY created_at DESC
-	CreatedAtDesc
-	// ORDER BY updated_at ASC
-	UpdatedAtAsc
-	// ORDER BY updated_at DESC
-	UpdatedAtDesc
-)
-
-var orderQueryMap = map[Order]string{
-	CreatedAtAsc:  "created_at ASC",
-	CreatedAtDesc: "created_at DESC",
-	UpdatedAtAsc:  "updated_at ASC",
-	UpdatedAtDesc: "updated_at DESC",
-}
-
 type (
-	// Order type
-	Order int
-
 	// Repository structure is implementation of UserRepository interface
 	Repository struct {
 		db        *sqlx.DB
 		tableName string
 	}
 )
-
-func (o Order) String() string {
-	if v, ok := orderQueryMap[o]; ok {
-		return v
-	}
-	return ""
-}
 
 // NewRepository factory
 func NewRepository(db *sqlx.DB, tableName string) *Repository {
@@ -88,7 +59,6 @@ func (r *Repository) GetList(c ...Condition) ([]*User, error) {
 	q = q + sq
 	q = r.db.Rebind(q)
 	ul := make([]*User, 0)
-	fmt.Println(fmt.Printf("query: %s; params: %+v", q, params))
 	if err := r.db.Select(&ul, q, params...); err != nil {
 		if err == sql.ErrNoRows {
 			return nil, ErrNotFound

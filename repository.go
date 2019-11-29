@@ -81,29 +81,15 @@ func (r *Repository) GetByEmail(email string) (*User, error) {
 }
 
 // GetList fetch users list
-func (r *Repository) GetList(limit, offset int, order ...Order) ([]*User, error) {
-	q := "SELECT * FROM %s"
+func (r *Repository) GetList(c ...Condition) ([]*User, error) {
+	q := "SELECT * FROM %s "
 	q = fmt.Sprintf(q, r.tableName)
-	if limit <= 0 {
-		limit = 100
-	}
-	if offset < 0 {
-		offset = 0
-	}
-	if len(order) > 0 {
-		q = q + " ORDER BY"
-		for k, o := range order {
-			if k > 0 {
-				q = q + ", " + o.String()
-			} else {
-				q = q + " " + o.String()
-			}
-		}
-	}
-	q = q + " LIMIT ? OFFSET ?"
+	sq, params := ConditionsToQuery(c...)
+	q = q + sq
 	q = r.db.Rebind(q)
 	ul := make([]*User, 0)
-	if err := r.db.Select(&ul, q, limit, offset); err != nil {
+	fmt.Println(fmt.Printf("query: %s; params: %+v", q, params))
+	if err := r.db.Select(&ul, q, params...); err != nil {
 		if err == sql.ErrNoRows {
 			return nil, ErrNotFound
 		}

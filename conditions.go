@@ -106,7 +106,7 @@ func Offset(v int) Condition {
 }
 
 // ConditionsToQuery represents conditions slice to query string and parameters slice
-func ConditionsToQuery(cs ...Condition) (q string, params []interface{}) {
+func conditionsToQuery(cs ...Condition) (q string, params []interface{}) {
 	if len(cs) == 0 {
 		return
 	}

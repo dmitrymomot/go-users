@@ -84,7 +84,7 @@ func (r *Repository) GetByEmail(email string) (*User, error) {
 func (r *Repository) GetList(c ...Condition) ([]*User, error) {
 	q := "SELECT * FROM %s "
 	q = fmt.Sprintf(q, r.tableName)
-	sq, params := ConditionsToQuery(c...)
+	sq, params := conditionsToQuery(c...)
 	q = q + sq
 	q = r.db.Rebind(q)
 	ul := make([]*User, 0)

@@ -18,7 +18,7 @@ type (
 	UserRepository interface {
 		GetByID(id string) (*User, error)
 		GetByEmail(email string) (*User, error)
-		GetList(condition ...interface{}) ([]*User, error)
+		GetList(limit, offset int, order ...Order) ([]*User, error)
 		Insert(*User) error
 		Update(*User) error
 		Delete(id string) error
@@ -45,8 +45,8 @@ func (i *Interactor) GetByEmail(email string) (*User, error) {
 }
 
 // GetList od users with sorting and optional conditional
-func (i *Interactor) GetList(condition ...interface{}) ([]*User, error) {
-	return i.repository.GetList(condition...)
+func (i *Interactor) GetList(limit, offset int, order ...Order) ([]*User, error) {
+	return i.repository.GetList(limit, offset, order...)
 }
 
 // Create new user

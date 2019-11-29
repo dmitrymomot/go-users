@@ -8,13 +8,42 @@ import (
 	"github.com/pkg/errors"
 )
 
+// Predefined users list ordering
+const (
+	// ORDER BY created_at ASC
+	CreatedAtAsc Order = iota + 1
+	// ORDER BY created_at DESC
+	CreatedAtDesc
+	// ORDER BY updated_at ASC
+	UpdatedAtAsc
+	// ORDER BY updated_at DESC
+	UpdatedAtDesc
+)
+
+var orderQueryMap = map[Order]string{
+	CreatedAtAsc:  "created_at ASC",
+	CreatedAtDesc: "created_at DESC",
+	UpdatedAtAsc:  "updated_at ASC",
+	UpdatedAtDesc: "updated_at DESC",
+}
+
 type (
+	// Order type
+	Order int
+
 	// Repository structure is implementation of UserRepository interface
 	Repository struct {
 		db        *sqlx.DB
 		tableName string
 	}
 )
+
+func (o Order) String() string {
+	if v, ok := orderQueryMap[o]; ok {
+		return v
+	}
+	return ""
+}
 
 // NewRepository factory
 func NewRepository(db *sqlx.DB, tableName string) *Repository {
@@ -52,23 +81,29 @@ func (r *Repository) GetByEmail(email string) (*User, error) {
 }
 
 // GetList fetch users list
-func (r *Repository) GetList(condition ...interface{}) ([]*User, error) {
+func (r *Repository) GetList(limit, offset int, order ...Order) ([]*User, error) {
 	q := "SELECT * FROM %s"
 	q = fmt.Sprintf(q, r.tableName)
-	conditionOpt := make([]interface{}, 0)
-	if len(condition) > 0 {
-		cq, ok := condition[0].(string)
-		if !ok {
-			return nil, ErrConditionNotString
-		}
-		q = q + " " + cq
-		if len(condition) > 1 {
-			conditionOpt = condition[1:]
+	if limit <= 0 {
+		limit = 100
+	}
+	if offset < 0 {
+		offset = 0
+	}
+	if len(order) > 0 {
+		q = q + " ORDER BY"
+		for k, o := range order {
+			if k > 0 {
+				q = q + ", " + o.String()
+			} else {
+				q = q + " " + o.String()
+			}
 		}
 	}
+	q = q + " LIMIT ? OFFSET ?"
 	q = r.db.Rebind(q)
 	ul := make([]*User, 0)
-	if err := r.db.Select(&ul, q, conditionOpt...); err != nil {
+	if err := r.db.Select(&ul, q, limit, offset); err != nil {
 		if err == sql.ErrNoRows {
 			return nil, ErrNotFound
 		}

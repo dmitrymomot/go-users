@@ -54,8 +54,8 @@ func (i *Interactor) Create(u *User) error {
 	if u.ID == "" {
 		u.ID = uuid.New().String()
 	}
-	if u.CreatedAt.IsZero() {
-		u.CreatedAt = time.Now()
+	if u.CreatedAt == 0 {
+		u.CreatedAt = time.Now().Unix()
 	}
 	if u.Email == "" {
 		return ErrEmailMissed
@@ -72,7 +72,7 @@ func (i *Interactor) Update(u *User) error {
 		return ErrNotExistedUser
 	}
 	if u.UpdatedAt == nil {
-		t := time.Now()
+		t := time.Now().Unix()
 		u.UpdatedAt = &t
 	}
 	if u.Email == "" {
@@ -119,7 +119,7 @@ func (i *Interactor) Confirm(token string) error {
 		return err
 	}
 	u.Confirmed = true
-	t := time.Now()
+	t := time.Now().Unix()
 	u.UpdatedAt = &t
 	if err := i.repository.Update(u); err != nil {
 		return err
@@ -153,7 +153,7 @@ func (i *Interactor) ResetPassword(token string, newPassword string) error {
 	if err := u.SetPassword(newPassword); err != nil {
 		return err
 	}
-	t := time.Now()
+	t := time.Now().Unix()
 	u.UpdatedAt = &t
 	if err := i.repository.Update(u); err != nil {
 		return err

@@ -1,21 +1,19 @@
 package users
 
 import (
-	"time"
-
 	"github.com/dmitrymomot/go-utilities/hash"
 )
 
 type (
 	// User model structure
 	User struct {
-		ID        string     `json:"id"`
-		Email     string     `json:"email"`
-		Password  string     `json:"-"`
-		Confirmed bool       `json:"confirmed"`
-		Disabled  bool       `json:"disabled"`
-		CreatedAt time.Time  `json:"created_at"`
-		UpdatedAt *time.Time `json:"updated_at,omitempty"`
+		ID        string `db:"id" json:"id"`
+		Email     string `db:"email" json:"email"`
+		Password  string `db:"password" json:"-"`
+		Confirmed bool   `db:"confirmed" json:"confirmed"`
+		Disabled  bool   `db:"disabled" json:"disabled"`
+		CreatedAt int64  `db:"created_at" json:"created_at"`
+		UpdatedAt *int64 `db:"updated_at" json:"updated_at,omitempty,"`
 	}
 )
 

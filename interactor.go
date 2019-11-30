@@ -78,7 +78,7 @@ func (i *Interactor) Update(u *User) error {
 	if u.Email == "" {
 		return ErrEmailMissed
 	}
-	return i.repository.Insert(u)
+	return i.repository.Update(u)
 }
 
 // Delete user by id

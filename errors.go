@@ -14,5 +14,4 @@ var (
 	ErrCouldNotSetPassword   = errors.New("could not set password")
 	ErrInvalidToken          = errors.New("invalid token string")
 	ErrCouldNotGenerateToken = errors.New("could not generate new token")
-	ErrConditionNotString    = errors.New("condition must be a string")
 )

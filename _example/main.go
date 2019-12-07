@@ -1,6 +1,7 @@
 package main
 
 import (
+	"database/sql"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -8,18 +9,17 @@ import (
 
 	users "github.com/dmitrymomot/go-users"
 	"github.com/dmitrymomot/random"
-	"github.com/jmoiron/sqlx"
 	_ "github.com/mattn/go-sqlite3" // or another driver
 )
 
 func main() {
-	db, err := sqlx.Connect("sqlite3", "./test.db")
+	db, err := sql.Open("sqlite3", "./test.db")
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer db.Close()
 
-	db.MustExec(`
+	db.Exec(`
 	CREATE TABLE IF NOT EXISTS users (
 		id TEXT PRIMARY KEY,
 		email TEXT NOT NULL UNIQUE,
@@ -31,10 +31,10 @@ func main() {
 	);
 	`)
 
-	ui := users.NewInteractor(users.NewRepository(db, "users"), "secret%Key")
+	ui := users.NewInteractor(users.NewRepository(db, "sqlite3", "users"), "secret%Key")
 
 	d := &users.User{
-		Email: random.String(10) + "@dmomot.com",
+		Email: random.String(10) + "@m.dev",
 	}
 	d.SetPassword("passwd")
 	if err = ui.Create(d); err != nil {
@@ -80,7 +80,7 @@ func main() {
 	// fmt.Printf("query: %s; params: %+v", q, p)
 
 	ul, err := ui.GetList(
-		users.OrderBy(users.CreatedAtDesc, users.UpdatedAtDesc),
+		users.OrderBy(users.OrderByCreatedAtDesc, users.OrderByUpdatedAtDesc),
 		// users.Offset(20),
 		users.Limit(3),
 		// users.Confirmed(true),

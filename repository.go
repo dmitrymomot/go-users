@@ -17,8 +17,8 @@ type (
 )
 
 // NewRepository factory
-func NewRepository(db *sqlx.DB, tableName string) *Repository {
-	return &Repository{db: db, tableName: tableName}
+func NewRepository(db *sql.DB, driverName, tableName string) *Repository {
+	return &Repository{db: sqlx.NewDb(db, driverName), tableName: tableName}
 }
 
 // GetByID fetch user record by id
